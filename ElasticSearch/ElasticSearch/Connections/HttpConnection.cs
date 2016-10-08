@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ElasticSearch.Connections
 {
-    class HttpConnection
+    public class HttpConnection
     {
     }
 }

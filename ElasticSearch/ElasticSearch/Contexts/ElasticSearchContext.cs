@@ -7,13 +7,15 @@ using System.Threading.Tasks;
 namespace ElasticSearch.Contexts
 {
     
-    class ElasticSearchContext
+    public class ElasticSearchContext
     {
         public String Url { get; private set; }
+        private Uri parsedUri;
 
         public ElasticSearchContext(String url)
         {
             Url = url;
+            parsedUri = new Uri(url);
         }
 
 
