@@ -23,8 +23,54 @@ namespace ElasticSearch.Connections
                 baseUrl = baseUrl + "/";
             }
             baseUrl = baseUrl + url;
-            var message= await new HttpClient().PostAsync(baseUrl, content);
-            return message.ToString();
+            String message = String.Empty;
+            using (var client = new HttpClient())
+            {
+                message = client.PostAsync(baseUrl, content).ToString();
+            }
+            return message;
+        }
+        public async Task<bool> indexExists(String indexName)
+        {
+            if (String.IsNullOrEmpty(indexName))
+            {
+                throw new Exception("Index name is null or empty");
+            }
+            var indexUrl = $"{serverUri}/{indexName}";
+            using(var client=new HttpClient())
+            {
+                HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Head, indexUrl);
+                var response = await client.SendAsync(message);
+                return response.StatusCode == System.Net.HttpStatusCode.OK;
+            }
+        }
+
+        public async Task deleteIndex(String indexName)
+        {
+            if (String.IsNullOrEmpty(indexName))
+            {
+                throw new Exception("Index name is null or empty");
+            }
+
+            var indexUrl = $"{serverUri}/{indexName}";
+            using(var client=new HttpClient())
+            {
+                await client.DeleteAsync(indexUrl);
+            }
+        }
+
+        public async Task createIndex(String indexName)
+        {
+            if (String.IsNullOrEmpty(indexName))
+            {
+                throw new Exception("Indexname is null or empty");
+            }
+            var indexUrl = $"{serverUri}/{indexName}";
+            using(var client=new HttpClient())
+            {
+                HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Put, indexUrl);
+                await client.SendAsync(message);
+            }
         }
     }
 }
