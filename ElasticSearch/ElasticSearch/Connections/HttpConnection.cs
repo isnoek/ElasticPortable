@@ -34,14 +34,14 @@ namespace ElasticSearch.Connections
         }
 
         /// <summary>
-        /// 
+        /// Fetch a list of matching objects
         /// </summary>
-        /// <typeparam name="TResultType"></typeparam>
-        /// <param name="index"></param>
-        /// <param name="type"></param>
-        /// <param name="searchTerms"></param>
-        /// <param name="searchType"></param>
-        /// <returns></returns>
+        /// <typeparam name="TResultType">the return type of the object</typeparam>
+        /// <param name="index">the name of the index</param>
+        /// <param name="type">the type within elastic</param>
+        /// <param name="searchTerms">the searchterms</param>
+        /// <param name="searchType">match or term</param>
+        /// <returns>an (empty) enumerable of objects</returns>
         public async Task<IEnumerable<SearchResult<TResultType>>> fetch<TResultType>(String index,
             String type,
             Dictionary<String,String> searchTerms,
@@ -59,7 +59,7 @@ namespace ElasticSearch.Connections
             }
             if (!searchTerms.Keys.Any())
             {
-                return findAllTerms<TResultType>(index, type, searchTerms);
+                return await findAllTerms<TResultType>(index, type, searchTerms);
             }
             switch(searchType)
             {
@@ -70,9 +70,18 @@ namespace ElasticSearch.Connections
             return new List<SearchResult<TResultType>>().AsEnumerable();
         }
 
-        private IEnumerable<SearchResult<TResultType>> findAllTerms<TResultType>(string index, string type, Dictionary<string, string> searchTerms) where TResultType : class, new()
+        private async Task<IEnumerable<SearchResult<TResultType>>> findAllTerms<TResultType>(string index, string type, Dictionary<string, string> searchTerms) where TResultType : class, new()
         {
-            throw new NotImplementedException();
+            var searchUrl = $"{serverUri}/{index}/{type}/_search";
+            using(var client=new HttpClient())
+            {
+                var response = await client.GetAsync(searchUrl);
+                var responseJson = await response.Content.ReadAsStringAsync();
+                
+                
+            }
+
+            return null;
         }
 
         public async Task<bool> insert(String indexName,String type,Object o)

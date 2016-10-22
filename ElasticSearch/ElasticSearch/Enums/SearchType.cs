@@ -10,5 +10,7 @@ namespace ElasticSearch.Enums
     {
         MATCH,
         TERM
+
+        
     }
 }
