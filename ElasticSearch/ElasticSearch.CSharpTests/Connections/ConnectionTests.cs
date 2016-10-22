@@ -1,4 +1,5 @@
 ﻿using ElasticSearch.Connections;
+using ElasticSearch.CSharpTests.Models;
 using ElasticSearch.CSharpTests.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -14,6 +15,7 @@ namespace ElasticSearch.CSharpTests.Connections
     {
         private String ElasticUrl = "http://localhost:9200";
         private String TestIndexName = "testindex";
+        private String TestType = "testmodel-nl";
 
         [TestInitialize]
         public void setUp()
@@ -42,7 +44,29 @@ namespace ElasticSearch.CSharpTests.Connections
             deleteIndex.Wait();
         }
 
+        [TestMethod]
+        public void testInsert()
+        {
+            HttpConnection connection = new HttpConnection(ElasticUrl);
+            Task createTask = connection.createIndex(TestIndexName);
+            createTask.Wait();
 
+            Task<bool> indexExists = connection.indexExists(TestIndexName);
+            indexExists.Wait();
+            Assert.IsTrue(indexExists.Result);
+
+            TestModel model = new TestModel() { FirstName = "Bill", LastName = "Gates" };
+            Task<bool> insertTask = connection.insert(TestIndexName,TestType, model);
+            insertTask.Wait();
+
+            Task deleteIndex = connection.deleteIndex(TestIndexName);
+            deleteIndex.Wait();
+
+            indexExists = connection.indexExists(TestIndexName);
+            indexExists.Wait();
+            Assert.IsFalse(indexExists.Result);
+
+        }
         [TestMethod]
         public void TestConnectionInitialize()
         {
